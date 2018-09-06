@@ -3,3 +3,18 @@ python main.py hmdb51 RGB data/hmdb51_rgb_train_split_1.txt data/hmdb51_rgb_val_
    --gd 20 --lr 0.001 --lr_steps 30 60 --epochs 80
    -b 128 -j 8 --dropout 0.8
    --snapshot_pref hmdb51_bninception_
+
+
+
+
+ hmdb51 Flow data/hmdb51_flow_train_split_1.txt data/hmdb51_flow_val_split_1.txt
+   --arch BNInception --num_segments 3
+   --gd 20 --lr 0.001 --lr_steps 190 300 --epochs 340
+   -b 64 -j 8 --dropout 0.7
+   --snapshot_pref hmdb51_bninception_ --flow_pref flow_  --gpus 0
+
+   python test_models.py hmdb51 RGB data/hmdb51_rgb_val_split_1.txt hmdb51_bninception__rgb_checkpoint.pth.tar
+   --arch BNInception --save_scores scores/hmdb51_rgb_split1_b_64 --gpus 0
+
+
+   hmdb51 RGB data/hmdb51_rgb_val_split_1.txt hmdb51_bninception__rgb_model_best.pth.tar --arch BNInception --save_scores scores/hmdb51_rgb_split1_b_64 --gpus 0

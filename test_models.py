@@ -51,6 +51,8 @@ net = TSN(num_class, 1, args.modality,
           dropout=args.dropout)
 print net
 checkpoint = torch.load(args.weights)
+
+
 count = 0
 base_dict = {}
 for k, v in checkpoint.items():
@@ -60,16 +62,18 @@ for k, v in checkpoint.items():
         base_dict.setdefault(k[7:], checkpoint[k])
     if count<19:
         base_dict.setdefault(k, checkpoint[k])
-base_dict.setdefault('new_fc.weight', checkpoint['base_model.fc-action.1.weight'])
-base_dict.setdefault('new_fc.bias', checkpoint['base_model.fc-action.1.bias'])
-# For kinetics dataset:
-# base_dict.setdefault('new_fc.weight', checkpoint['base_model.fc_action.1.weight'])
-# base_dict.setdefault('new_fc.bias', checkpoint['base_model.fc_action.1.bias'])
 
-#print("model epoch {} best prec@1: {}".format(checkpoint['epoch'], checkpoint['best_prec1']))
+# 2018.9.6.
+# the name of checkpoint and the model load by torch are not the same, the prefix "module" need to be deleted.
+for k,v in checkpoint['state_dict'].items():
+    if 'module.' in k:
+        base_dict['state_dict'].setdefault(k[7:], base_dict['state_dict'].pop(k))
 
-net.load_state_dict(base_dict)
+# print i
 
+# 2018.9.6. wrong here
+# net.load_state_dict(base_dict)
+net.load_state_dict(base_dict['state_dict'])
 if args.test_crops == 1:
     cropping = torchvision.transforms.Compose([
         GroupScale(net.scale_size),
